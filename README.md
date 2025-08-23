@@ -1,4 +1,8 @@
-# Military Aircrafts Classifier
+# Military Aerial Vehicle Classifier
+
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://huggingface.co/spaces/MSarvesh2K6/Military-Aircrafts-Classifier)
+
+### **[>> Try the Live Interactive Demo <<](https://huggingface.co/spaces/MSarvesh2K6/Military-Aircrafts-Classifier)**
 
 ---
 
@@ -6,11 +10,13 @@
 
 This project is a high-accuracy, deep learning model capable of classifying **40 different military aerial vehicles**, including fighter jets, bombers, helicopters, and drones. The model was built using TensorFlow and Keras, leveraging a fine-tuned `EfficientNetB3` architecture to achieve a final **test accuracy of 91.62%**.
 
-The project showcases a complete, end-to-end machine learning workflow, from data curation and preprocessing to iterative model improvement and a final, interactive web application built with Streamlit.
+The project showcases a complete, end-to-end machine learning workflow, from data curation and preprocessing to iterative model improvement and final deployment as an interactive web application.
 
 ## Visual Demo
 
 A screenshot of the interactive Streamlit application in action.
+
+*(To add your screenshot: upload the image to your GitHub repo, click on the image file, click "Download", copy the URL, and paste it here.)*
 
 ![Streamlit App Demo](YOUR_SCREENSHOT_LINK_HERE)
 
@@ -20,15 +26,15 @@ A screenshot of the interactive Streamlit application in action.
 - **State-of-the-Art Model:** Utilizes a fine-tuned `EfficientNetB3`, a powerful and efficient convolutional neural network.
 - **Robust Training:** Employs data augmentation and standard callbacks like Early Stopping and Model Checkpointing to prevent overfitting and ensure generalization.
 - **Interactive Application:** A user-friendly web app built with Streamlit that allows for real-time predictions, featuring a confidence threshold slider and a top-5 prediction analysis.
-- **Curated Dataset:** The model is trained on a focused, high-quality dataset of 40 distinct aircraft classes, refined from a larger original dataset.
+- **Curated Dataset:** The model is trained on a focused, high-quality dataset of 40 distinct aerial vehicle classes, refined from a larger original dataset.
 
 ## The Journey: From Baseline to High-Performance Model
 
 This project followed a deliberate, iterative process to move beyond a simple baseline and build a truly robust model.
 
 1.  **Baseline Model:** An initial model was trained, achieving a promising **82% validation accuracy**.
-2.  **Real-World Testing & Diagnosis:** To test its true capabilities, the baseline model was evaluated on new, "in-the-wild" images from the internet. This test revealed a performance drop to approximately **47% accuracy**, diagnosing a classic overfitting problem.
-3.  **Solution & Iteration:** To solve this, the model was retrained with **data augmentation** (`RandomFlip`, `RandomRotation`, `RandomZoom`) to improve generalization. The training process was also made more robust with standard callbacks like `EarlyStopping` and `ReduceLROnPlateau`.
+2.  **Real-World Testing & Diagnosis:** To test its true capabilities, the baseline model was evaluated on new, "in-the-wild" images. This test revealed a performance drop to approximately **47% accuracy**, diagnosing a classic overfitting problem.
+3.  **Solution & Iteration:** To solve this, the model was retrained with **data augmentation** (`RandomFlip`, `RandomRotation`, `RandomZoom`) and robust callbacks like `EarlyStopping` and `ReduceLROnPlateau`.
 4.  **Final Results:** This iterative process was highly successful, resulting in a final model with **91.62% accuracy** on the unseen test set, demonstrating a vast improvement in real-world performance.
 
 ## Dataset Curation
@@ -39,17 +45,19 @@ The original dataset from Kaggle contained 88 classes with varying image quality
 - **Python**
 - **TensorFlow & Keras** for model building and training
 - **Streamlit** for the interactive web application
+- **Hugging Face Spaces** for deployment
 - **Pandas & NumPy** for data manipulation
 - **Scikit-learn** for evaluation metrics
 - **Matplotlib & Seaborn** for data visualization
 - **Kaggle** for the training environment
 
-## Running the Interactive Demo
+## Running the Demo
 
-The interactive Streamlit application can be run on your local machine.
+### Live Demo (Recommended)
+The easiest way to use the model is via the **live Streamlit demo** linked at the top of this README.
 
 ### Local Setup Instructions
-To run the application, please follow these steps:
+To run the application on your local machine, follow these steps:
 ```bash
 # 1. Clone the repository
 git clone https://github.com/SARVESH2K6/Military-Aircraft-Classifier.git
@@ -84,4 +92,3 @@ This project utilizes the Military Aircraft Dataset, sourced from Kaggle. Proper
 
 * **Source:** [Military Aircraft Detection Dataset on Kaggle](https://www.kaggle.com/datasets/a2015003713/militaryaircraftdetectiondataset)
 * **License:** CC0: Public Domain
-
