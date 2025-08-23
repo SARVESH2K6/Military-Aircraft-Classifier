@@ -52,7 +52,7 @@ The interactive Streamlit application can be run on your local machine.
 To run the application, please follow these steps:
 ```bash
 # 1. Clone the repository
-git clone [https://github.com/SARVESH2K6/Military-Aircraft-Classifier.git](https://github.com/SARVESH2K6/Military-Aircraft-Classifier.git)
+git clone https://github.com/SARVESH2K6/Military-Aircraft-Classifier.git
 cd Military-Aircraft-Classifier
 
 # 2. Install the required dependencies
@@ -84,3 +84,4 @@ This project utilizes the Military Aircraft Dataset, sourced from Kaggle. Proper
 
 * **Source:** [Military Aircraft Detection Dataset on Kaggle](https://www.kaggle.com/datasets/a2015003713/militaryaircraftdetectiondataset)
 * **License:** CC0: Public Domain
+
