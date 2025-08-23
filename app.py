@@ -1,4 +1,4 @@
-# app.py
+# app.py (Deep Debugging Version)
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 
@@ -18,14 +18,8 @@ st.set_page_config(
 
 # --- Function to Build the Model Architecture ---
 def build_model(class_count):
-    """
-    Builds the exact same model architecture that was used for training.
-    """
-    # --- DEBUGGING STEP ---
-    # This will print to the Streamlit deploy log to confirm the shape.
     input_shape_to_use = (224, 224, 3)
-    print(f"DEBUG LOG: Building model with input shape: {input_shape_to_use}")
-    # --------------------
+    st.write(f"--- INSIDE build_model: Building model with shape {input_shape_to_use}") # DEBUG PRINT
 
     data_augmentation = tf.keras.models.Sequential([
         tf.keras.layers.RandomFlip("horizontal"),
@@ -34,9 +28,7 @@ def build_model(class_count):
     ], name="data_augmentation")
 
     base_model = tf.keras.applications.EfficientNetB3(
-        include_top=False,
-        weights='imagenet',
-        input_shape=input_shape_to_use
+        include_top=False, weights='imagenet', input_shape=input_shape_to_use
     )
     base_model.trainable = True
 
@@ -53,7 +45,8 @@ def build_model(class_count):
     return model
 
 # --- Model and Class Loading Function ---
-@st.cache_resource
+# IMPORTANT: Caching is temporarily disabled for this test by commenting out the decorator
+# @st.cache_resource
 def load_model_and_classes():
     try:
         with open('class_indices.json', 'r') as f:
@@ -63,8 +56,7 @@ def load_model_and_classes():
         class_count = len(class_indices)
         
         model = build_model(class_count)
-        # Ensure this is the correct filename
-        model.load_weights('model.weights.h5')
+        model.load_weights('final_aircraft_weights.h5')
         
         return model, index_to_label
     except Exception as e:
@@ -75,79 +67,51 @@ def load_model_and_classes():
 model, index_to_label = load_model_and_classes()
 
 # --- Prediction Function ---
-def predict(image, model, index_to_label_map, top_k=5):
-    img = image.resize((224, 224))
-    img_array = tf.keras.preprocessing.image.img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0)
-    img_array = tf.keras.applications.efficientnet.preprocess_input(img_array)
+def predict(image, model, index_to_label_map):
+    st.write("--- INSIDE predict function ---") # DEBUG PRINT
     
+    img_resized = image.resize((224, 224))
+    st.write(f"1. After PIL resize to (224, 224): Image mode is '{img_resized.mode}', Size is {img_resized.size}") # DEBUG PRINT
+    
+    img_array = tf.keras.preprocessing.image.img_to_array(img_resized)
+    st.write(f"2. After img_to_array: Array shape is {img_array.shape}, Data type is {img_array.dtype}") # DEBUG PRINT
+    
+    img_array = np.expand_dims(img_array, axis=0)
+    st.write(f"3. After expand_dims (adding batch dimension): Shape is {img_array.shape}") # DEBUG PRINT
+    
+    img_array = tf.keras.applications.efficientnet.preprocess_input(img_array)
+    st.write(f"4. After preprocess_input: Shape is {img_array.shape}, Min value is {np.min(img_array):.2f}, Max value is {np.max(img_array):.2f}") # DEBUG PRINT
+    
+    st.write("--- PREDICTION ---") # DEBUG PRINT
     predictions = model.predict(img_array)[0]
     
-    top_k_indices = np.argsort(predictions)[-top_k:][::-1]
+    top_k_indices = np.argsort(predictions)[-5:][::-1]
     top_k_scores = predictions[top_k_indices]
     
     results = {index_to_label_map[str(i)]: float(s * 100) for i, s in zip(top_k_indices, top_k_scores)}
     
     return results
 
-# --- Streamlit App Layout ---
+# --- Streamlit UI ---
+st.title("✈️ Military Aircraft Classifier (Debug Mode)")
+st.markdown("Upload an image to see the debug output.")
 
-# Sidebar
-st.sidebar.title("About & Controls")
-st.sidebar.info(
-    "This is a deep learning application for classifying military aircraft, "
-    "built as a portfolio project to demonstrate a complete machine learning workflow.\n\n"
-    "**Model:** Fine-tuned `EfficientNetB3`\n\n"
-    "**Final Test Accuracy:** 91.62%\n\n"
-    "**Number of Classes:** 40\n\n"
-    "For a detailed write-up and the complete source code, please visit the GitHub repository:"
-)
-st.sidebar.markdown("[GitHub Repository](https://github.com/SARVESH2K6/Military-Aircraft-Classifier)")
-
-# Confidence Threshold Slider
-st.sidebar.header("Prediction Controls")
-confidence_threshold = st.sidebar.slider(
-    "Set Confidence Threshold (%)", 
-    min_value=0, 
-    max_value=100, 
-    value=50, # Default value
-    step=5
-)
-
-# Main Page
-# --- DEBUGGING STEP ---
-# Added a version number to the title
-st.title("✈️ Military Aircraft Classifier v1.1")
-# --------------------
-st.markdown("Upload an image of a military aircraft, and the model will predict its class.")
-
-# File Uploader
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
 if model is not None and uploaded_file is not None:
     image = Image.open(uploaded_file)
-    
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.image(image, caption='Image to be classified', use_column_width=True)
-    
+    st.image(image, caption='Image to be classified', use_column_width=True)
     st.markdown("---")
-
-    with st.spinner('Analyzing the aircraft...'):
-        results = predict(image, model, index_to_label)
     
+    # Run the prediction and show debug info
+    results = predict(image, model, index_to_label)
+    
+    # Display the final result
+    st.markdown("---")
+    st.header("Final Prediction Result")
     top_prediction_class = list(results.keys())[0]
     top_prediction_confidence = list(results.values())[0]
-
-    if top_prediction_confidence >= confidence_threshold:
-        st.success(f"**Top Prediction:** {top_prediction_class}")
-        st.info(f"**Confidence:** {top_prediction_confidence:.2f}%")
-    else:
-        st.warning(f"**Low Confidence Prediction:** The model is not confident about its top guess.")
-        st.info(f"**Best Guess:** {top_prediction_class} (Confidence: {top_prediction_confidence:.2f}%)")
-        st.markdown("The chart below shows the model's uncertainty among the top predictions.")
-    
-    st.markdown("### Top Predictions")
+    st.success(f"**Top Prediction:** {top_prediction_class} (Confidence: {top_prediction_confidence:.2f}%)")
     result_df = pd.DataFrame(list(results.items()), columns=['Aircraft', 'Confidence (%)'])
     st.bar_chart(result_df.set_index('Aircraft'))
 
