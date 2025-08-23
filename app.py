@@ -21,6 +21,12 @@ def build_model(class_count):
     """
     Builds the exact same model architecture that was used for training.
     """
+    # --- DEBUGGING STEP ---
+    # This will print to the Streamlit deploy log to confirm the shape.
+    input_shape_to_use = (224, 224, 3)
+    print(f"DEBUG LOG: Building model with input shape: {input_shape_to_use}")
+    # --------------------
+
     data_augmentation = tf.keras.models.Sequential([
         tf.keras.layers.RandomFlip("horizontal"),
         tf.keras.layers.RandomRotation(0.1),
@@ -30,12 +36,12 @@ def build_model(class_count):
     base_model = tf.keras.applications.EfficientNetB3(
         include_top=False,
         weights='imagenet',
-        input_shape=(224, 224, 3) # <-- This MUST be 3 for color images
+        input_shape=input_shape_to_use
     )
     base_model.trainable = True
 
     model = tf.keras.models.Sequential([
-        tf.keras.layers.Input(shape=(224, 224, 3)), # <-- This MUST also be 3
+        tf.keras.layers.Input(shape=input_shape_to_use),
         data_augmentation,
         base_model,
         tf.keras.layers.BatchNormalization(axis=-1),
@@ -57,6 +63,7 @@ def load_model_and_classes():
         class_count = len(class_indices)
         
         model = build_model(class_count)
+        # Ensure this is the correct filename
         model.load_weights('model.weights.h5')
         
         return model, index_to_label
@@ -108,7 +115,10 @@ confidence_threshold = st.sidebar.slider(
 )
 
 # Main Page
-st.title("✈️ Military Aircraft Classifier")
+# --- DEBUGGING STEP ---
+# Added a version number to the title
+st.title("✈️ Military Aircraft Classifier v1.1")
+# --------------------
 st.markdown("Upload an image of a military aircraft, and the model will predict its class.")
 
 # File Uploader
@@ -117,10 +127,9 @@ uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png
 if model is not None and uploaded_file is not None:
     image = Image.open(uploaded_file)
     
-    # Display the image in a centered column
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.image(image, caption='Image to be classified', use_container_width=True)
+        st.image(image, caption='Image to be classified', use_column_width=True)
     
     st.markdown("---")
 
@@ -130,7 +139,6 @@ if model is not None and uploaded_file is not None:
     top_prediction_class = list(results.keys())[0]
     top_prediction_confidence = list(results.values())[0]
 
-    # NEW: Conditional Output based on threshold
     if top_prediction_confidence >= confidence_threshold:
         st.success(f"**Top Prediction:** {top_prediction_class}")
         st.info(f"**Confidence:** {top_prediction_confidence:.2f}%")
@@ -139,7 +147,6 @@ if model is not None and uploaded_file is not None:
         st.info(f"**Best Guess:** {top_prediction_class} (Confidence: {top_prediction_confidence:.2f}%)")
         st.markdown("The chart below shows the model's uncertainty among the top predictions.")
     
-    # Display the top predictions in a bar chart
     st.markdown("### Top Predictions")
     result_df = pd.DataFrame(list(results.items()), columns=['Aircraft', 'Confidence (%)'])
     st.bar_chart(result_df.set_index('Aircraft'))
