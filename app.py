@@ -18,6 +18,9 @@ st.set_page_config(
 
 # --- Function to Build the Model Architecture ---
 def build_model(class_count):
+    """
+    Builds the exact same model architecture that was used for training.
+    """
     data_augmentation = tf.keras.models.Sequential([
         tf.keras.layers.RandomFlip("horizontal"),
         tf.keras.layers.RandomRotation(0.1),
@@ -25,12 +28,14 @@ def build_model(class_count):
     ], name="data_augmentation")
 
     base_model = tf.keras.applications.EfficientNetB3(
-        include_top=False, weights='imagenet', input_shape=(224, 224, 3)
+        include_top=False,
+        weights='imagenet',
+        input_shape=(224, 224, 3) # <-- This MUST be 3 for color images
     )
     base_model.trainable = True
 
     model = tf.keras.models.Sequential([
-        tf.keras.layers.Input(shape=(224, 224, 3)),
+        tf.keras.layers.Input(shape=(224, 224, 3)), # <-- This MUST also be 3
         data_augmentation,
         base_model,
         tf.keras.layers.BatchNormalization(axis=-1),
