@@ -16,8 +16,6 @@ The project showcases a complete, end-to-end machine learning workflow, from dat
 
 A screenshot of the interactive Streamlit application in action.
 
-*(To add your screenshot: upload the image to your GitHub repo, click on the image file, click "Download", copy the URL, and paste it here.)*
-
 ![Streamlit App Demo](https://github.com/SARVESH2K6/Military-Aircraft-Classifier/blob/7fb1b7333025cd9abbd39375faf5a02850553332/Screenshot%20of%20App.png)
 
 ## Key Features
@@ -92,4 +90,5 @@ This project utilizes the Military Aircraft Dataset, sourced from Kaggle. Proper
 
 * **Source:** [Military Aircraft Detection Dataset on Kaggle](https://www.kaggle.com/datasets/a2015003713/militaryaircraftdetectiondataset)
 * **License:** CC0: Public Domain
+
 
